@@ -1,5 +1,5 @@
-// Shared Wayfinder viewer file. Edit Wayfinder/viewer/native-book.js, then run npm run sync-viewer. Hash fbb22f867ae8.
-import { initBookCrumb } from './breadcrumbs.js?v=20261016.2';
+// Shared Wayfinder viewer file. Edit Wayfinder/viewer/native-book.js, then run npm run sync-viewer. Hash 277aefdce769.
+import { initBookCrumb } from './breadcrumbs.js?v=20261018.1';
 // Every book opens through this entry. The address names the book.
 // A book page names its book in data-book. The earlier address names it in the query.
 const slug=document.documentElement.dataset.book||new URLSearchParams(location.search).get('book');
@@ -25,7 +25,7 @@ if(book?.status==='ready'){
   const ready=directory.filter(b=>b.status==='ready'),at=ready.indexOf(book);
   const neighbor=b=>b&&{id:b.id,name:b.name,url:b.url||`${b.id}.html`};
   globalThis.studyBook={id:slug,name:book.name,previousBook:neighbor(ready[at-1]),nextBook:neighbor(ready[at+1])};
-  await import('./app.js?v=20261016.2');
+  await import('./app.js?v=20261018.1');
 }else if(slug){
   document.querySelector('#main').innerHTML=`<section class="word-view"><h1>${book?.name||'Book not found'}</h1><p>This guide has not been built yet.</p><a href="./">Open the directory</a></section>`;
   document.querySelectorAll('.topbar button').forEach(b=>b.disabled=true);

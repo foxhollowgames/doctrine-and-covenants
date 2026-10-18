@@ -1,4 +1,4 @@
-import { initMenu, readPreferences, savePreferences } from './settings-menu.js?v=20261016.2';
+import { initMenu, readPreferences, savePreferences } from './settings-menu.js?v=20261018.1';
 // The home page lists every section. The menu sets how each section opens.
 const BOOK = 'doctrine-and-covenants';
 const menu = document.querySelector('#settingsMenu'), preferences = { studyMode: 'read', perspective: 'historical', ...readPreferences() };
@@ -46,6 +46,7 @@ function openDeclaration(item) {
     if (!text) continue; box.append(el('h3', '', label), el('p', '', text));
   }
   const a = el('a', 'source-link', 'Read the declaration on the Church’s site ↗'); a.href = item.url; a.target = '_blank'; a.rel = 'noopener'; box.append(a);
+  const t = el('a', 'source-link', 'See on timeline'); t.href = `../timeline/#event=${item.od}`; box.append(t);
   box.append(el('p', 'muted', 'The declaration text is not stored in this guide. Official Declaration 2 is under copyright.'));
   dialog.showModal();
 }

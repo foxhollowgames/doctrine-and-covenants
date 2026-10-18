@@ -1,12 +1,12 @@
-// Shared Wayfinder viewer file. Edit Wayfinder/viewer/app.js, then run npm run sync-viewer. Hash 4daf317120ee.
-import { initChapterPicker } from './chapter-picker.js?v=20261016.2';
-import { people, featurePortraits, wordPortraits, personProfileHtml, personIdForLabel, setPeople, setPortraitMode, webpCopy, webpSourceHtml } from './portraits.js?v=20261016.2';
-import { initMenu, readPreferences, savePreferences } from './settings-menu.js?v=20261016.2';
-import { initModalDragging } from './modal-drag.js?v=20261016.2';
-import { chapterFocus, chapterRoutes, chapterPoints, movementStyle } from './chapter-map.js?v=20261016.2';
+// Shared Wayfinder viewer file. Edit Wayfinder/viewer/app.js, then run npm run sync-viewer. Hash d66f47cec683.
+import { initChapterPicker } from './chapter-picker.js?v=20261018.1';
+import { people, featurePortraits, wordPortraits, personProfileHtml, personIdForLabel, setPeople, setPortraitMode, webpCopy, webpSourceHtml } from './portraits.js?v=20261018.1';
+import { initMenu, readPreferences, savePreferences } from './settings-menu.js?v=20261018.1';
+import { initModalDragging } from './modal-drag.js?v=20261018.1';
+import { chapterFocus, chapterRoutes, chapterPoints, movementStyle } from './chapter-map.js?v=20261018.1';
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
-const releaseVersion = '20261016.2';
+const releaseVersion = '20261018.1';
 // One reader serves every book. native-book.js names the book. The book's content file supplies its settings.
 const book = { id: '', name: '', bibleCode: '', chapterCount: 0, chapterDigits: 2, ...globalThis.studyBook };
 const storageKey = `${book.id}-native-study-state`;
@@ -20,6 +20,16 @@ let mapEventDates = [];
 const defaults = { chapter: 1, verse: 1, studyMode: 'read', view: 'map', perspective: 'historical', portraitMode: 'generated', date: 1, layers: { places: true, regions: true, campaigns: true, roads: false, history: false }, sidebar: 'scripture', map: { center: [32.1, 35.0], zoom: 7 } };
 // Menu choices apply to every book. The rest of the state belongs to this book.
 let state = { ...defaults, ...readSaved(), ...readPreferences(), layers: { ...defaults.layers, ...(readSaved().layers || {}) } };
+// The timeline lists the chapters it has an event for. Those chapters get a "See on timeline" link under the heading.
+// Event ids are book-chapter, and D&C sections are dc-N. When the list does not load, as on a local server, no link shows.
+let timelineIds = null;
+const timelineEventId = () => book.id === 'doctrine-and-covenants' ? `dc-${state.chapter}` : `${book.id}-${state.chapter}`;
+fetch('../timeline/data/chapters.json').then(r => r.ok ? r.json() : null).then(list => {
+  if (!Array.isArray(list?.events)) return;
+  timelineIds = new Set(list.events);
+  const block = document.querySelector('.chapter-picker-block');
+  if (block && !block.querySelector('.chapter-timeline-link')) block.insertAdjacentHTML('beforeend', timelineLinkHtml());
+}).catch(() => {});
 let data = { sources: [], passages: [], events: [], places: [], campaigns: [], ancientRoads: [], regions: [], words: [], guides: [], periods: [] };
 let scripture = { translation: 'World English Bible', chapters: {} };
 let map, savedScroll = 0, selectedWordButton, toastTimer, guideState = null, sidebarPersonHistory = [], entityLinkCache = {chapter:null, terms:[]};
@@ -417,9 +427,13 @@ function selectPassage(id) { const p = data.passages.find(x => x.id === id); if 
 function chapterDateLabel(chapter = state.chapter) {
   return data.chapterDateBands?.find(band => chapter >= band.from && chapter <= band.to)?.label || '';
 }
+function timelineLinkHtml() {
+  const id = timelineEventId();
+  return timelineIds?.has(id) ? `<a class="chapter-timeline-link" href="../timeline/#event=${encodeURIComponent(id)}">See on timeline</a>` : '';
+}
 function chapterDateHtml() {
   const label = chapterDateLabel();
-  return label ? `<p class="chapter-date" aria-label="Approximate historical or composition period: ${esc(label)}">${esc(label)}</p>` : '';
+  return (label ? `<p class="chapter-date" aria-label="Approximate historical or composition period: ${esc(label)}">${esc(label)}</p>` : '') + timelineLinkHtml();
 }
 function renderScripture() {
   sidebarPersonHistory = [];
