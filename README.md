@@ -81,3 +81,7 @@ The Bible books still work with this reader unchanged.
 - **People profiles were checked against JSP person pages** where they loaded. Some minor figures have uncertain dates, and their `reviewNote` says so.
 - **Jerusalem is not mapped.** It is named in sections 45, 77, and 133, but it is outside the map.
 - **No public URL yet.** A GitHub Pages workflow is included, matching Bible Wayfinder. It publishes `dist` on push to `main` once a repository exists.
+
+## Optional analytics
+
+The consent-gated analytics source is in the hub repository at viewer/analytics.js. Run npm run sync-analytics there to update the module and persistent HTML templates. Run this volume's HTML generator after changing book.html. Analytics choices lets visitors accept, decline, or withdraw. Only broad site sections are reported, not chapter or search state. See the hub README for privacy settings and verification instructions.
